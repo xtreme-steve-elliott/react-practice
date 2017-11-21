@@ -50,7 +50,7 @@ class Game extends React.Component {
     super(props);
     this.state = {
       history: [{
-        squares: Array(9).fill(null)
+        squares: Array(props.size * props.size).fill(null)
       }],
       stepNumber: 0,
       xIsNext: true,
@@ -202,9 +202,17 @@ function genLines(itemCount) {
 function calculateWinner(squares) {
   const lines = genLines(squares.length);
   for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return {done: true, winner: squares[a], cells: [a, b, c]};
+    const line = lines[i];
+    if (!line.length) {
+      return {done: true, winner: null, cells: []};
+    } else if (squares[line[0]]) {
+      const startEntry = squares[line[0]];
+      let success = line.slice(0).reduce((res, x, j) => {
+        return res && squares[x] == startEntry;
+      }, true);
+      if (success) {
+        return {done: true, winner: startEntry, cells: line};
+      }
     }
   }
   if (squares.every((item) => item != null)) {
@@ -216,6 +224,6 @@ function calculateWinner(squares) {
 // ========================================
 
 ReactDOM.render(
-  <Game />,
+  <Game size={3} />,
   document.getElementById('root')
 );
